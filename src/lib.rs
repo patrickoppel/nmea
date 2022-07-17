@@ -128,12 +128,12 @@ impl<'a> Nmea {
         self.fix_type
     }
 
-    /// Returns last fixed latitude in degress. None if not fixed.
+    /// Returns last fixed latitude in degrees. None if not fixed.
     pub fn latitude(&self) -> Option<f64> {
         self.latitude
     }
 
-    /// Returns last fixed longitude in degress. None if not fixed.
+    /// Returns last fixed longitude in degrees. None if not fixed.
     pub fn longitude(&self) -> Option<f64> {
         self.longitude
     }
@@ -166,11 +166,10 @@ impl<'a> Nmea {
         let mut ret = Vec::<Satellite, 58>::new();
         let sat_key = |sat: &Satellite| (sat.gnss_type() as u8, sat.prn());
         for sns in &self.satellites_scan {
-            // for sat_pack in sns.data.iter().rev() {
             for sat_pack in sns.data.iter().rev().flatten() {
                 for sat in sat_pack.iter() {
                     match ret.binary_search_by_key(&sat_key(sat), sat_key) {
-                        //already set
+                        // already set
                         Ok(_pos) => {}
                         Err(pos) => ret.insert(pos, sat.clone()).unwrap(),
                     }
@@ -266,7 +265,7 @@ impl<'a> Nmea {
     }
 
     /// Parse any NMEA sentence and stores the result. The type of sentence
-    /// is returnd if implemented and valid.
+    /// is returned if implemented and valid.
     pub fn parse(&mut self, s: &'a str) -> Result<SentenceType, NmeaError<'a>> {
         match parse(s.as_bytes())? {
             ParseResult::VTG(vtg) => {
@@ -329,7 +328,7 @@ impl<'a> Nmea {
                 return Ok(FixType::Invalid);
             }
             ParseResult::VTG(vtg) => {
-                //have no time field, so only if user explicity mention it
+                // have no time field, so only if user explicitly mention it
                 if self.required_sentences_for_nav.contains(&SentenceType::VTG) {
                     if vtg.true_course.is_none() || vtg.speed_over_ground.is_none() {
                         self.clear_position_info();
